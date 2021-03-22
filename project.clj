@@ -9,6 +9,4 @@
                  [com.bhauman/rebel-readline "0.1.4"]
                  [com.bhauman/rebel-readline-cljs "0.1.4"]
                  [cheshire/cheshire "5.10.0"]
-                 [markdown-clj/markdown-clj "1.10.5"]]
-  ;; :repl-options {:init-ns docist.core}
-  )
+                 [markdown-clj/markdown-clj "1.10.5"]])
