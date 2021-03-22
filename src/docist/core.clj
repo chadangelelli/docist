@@ -86,5 +86,6 @@
       :paths ["/Users/mars/Development/tec/src/tec/"]
       ;; :paths ["/Users/mars/Development/st-suite/stx/src/stx"]
       ;; :paths ["/Users/mars/Development/st-suite/st/src/st"]
+      ;; :paths ["/Users/mars/Development/docist/src/docist"]
       :parse ["clj" "cljs" "cljc"]}))
    nil))
