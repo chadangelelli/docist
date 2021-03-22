@@ -33,7 +33,13 @@
      (jar-file? file)    (ns/find-namespaces-in-jarfile (JarFile. file)))])
 
 (defn get-related
-  ""
+  "Returns related functions set as:
+
+  ```
+  DOCSTRING
+  ...
+  See also: `namespace-1/fn-name`, `namespace-2/fn-name`, ..
+  ```"
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
   [dir docstring]
@@ -44,7 +50,7 @@
            (mapv #(string/replace % "`" ""))))))
 
 (defn get-source
-  ""
+  "Returns source code for function (if possible)."
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
   [sym]
@@ -67,7 +73,7 @@
 
   Example:
 
-  ```
+  ```clojure
   a
     b
       c
@@ -77,7 +83,7 @@
 
   will become
 
-  ```
+  ```clojure
   a
   b
     c
@@ -104,11 +110,25 @@
       (string/join "\n" lns))))
 
 (defn make-arglists
+  "Returns a vector of stringified arglists."
+  ^{:author "Chad Angelelli"
+    :added "0.1.0"}
   [arglists]
   (mapv str arglists))
 
 (defn get-meta
-  ""
+  "Returns metadata for a function.
+
+  The format is as follows:
+
+  ```clojure
+  {:arglists [<signature-1>, <signature-n> ..]
+   :source <if-applicable>
+   :related <if-applicable>
+   :doc <STRING>
+   :line <INT>
+   :col <INT>}
+  ```"
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
   [dir file interns]
@@ -126,7 +146,7 @@
       (reduce {} interns)))
 
 (defn get-fns
-  ""
+  "Returns functions for a namespace."
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
   [m [dir file names]]
@@ -137,6 +157,10 @@
        (into {})))
 
 (defn get-clj-docs
+  "Returns metadata for namespaces, functions and source.
+  This is the main entry point for this namespace, as it calls all other functions."
+  ^{:author "Chad Angelelli"
+    :added "0.1.0"}
   [paths]
   (->> (map #(-> % io/file find-namespaces) paths)
        (reduce get-fns {})))
