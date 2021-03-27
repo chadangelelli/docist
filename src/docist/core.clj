@@ -130,7 +130,7 @@
    (time
     (make-docs
      {:output-to "docs"
-      :bootstrapped? true
+      ;; :bootstrapped? true
       :filename "index.html"
       :single-page? false
       :paths ["src"]

@@ -1,15 +1,10 @@
 (ns docist.cljs-reader
-  (:import java.util.jar.JarFile)
   (:require
+   [docist.utils :as utils]
    [clojure.java.io :as io]
-   [clojure.tools.namespace.find :as ns]
    [cljs.analyzer :as an]
    [cljs.analyzer.api :as ana]
-   [clojure.string :as string]
-   [clojure.repl :as repl]
-   [cheshire.core :as json]
-   [markdown.core :as md])
-  (:import [org.apache.commons.io FileUtils]))
+   [clojure.string :as string]))
 
 (defn cljs-file?
   "Returns boolean for file ending in .cljs."
@@ -27,17 +22,12 @@
   (and (.isFile file)
        (string/ends-with? (.getName file) ".cljc")))
 
-;;TODO: Fix broken arglists for CLJS
-(defn make-arglists-string
+(defn make-arglists
   "Returns a vector of stringified arglists."
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
-  [v]
-  (let [s (str v)
-        n (count s)]
-    (if (< n 1)
-      s
-      (subs s 7 (dec n)))))
+  [arglists]
+  (mapv str arglists))
 
 (defn get-meta
   "Returns metadata for a function.
@@ -59,9 +49,10 @@
               [(str k)
                (assoc meta'
                       :name (str k)
-                      :arglists (make-arglists-string (:arglists meta'))
-                      :source "TODO: get CLJS source"
+                      :arglists (make-arglists (second (:arglists meta')))
+                      :source "Not available for CLJS/CLJC."
                       ;; :source (slurp an/*cljs-file*)
+                      :doc (utils/fix-indent (:doc meta'))
                       :related "TODO: get CLJS related")])
             fns)
        (into {})))
@@ -77,8 +68,7 @@
                 ns-name (:ns (ana/parse-ns file))]
             (ana/no-warn (ana/analyze-file state file {}))
             (let [fns (:defs (ana/find-ns state ns-name))]
-              (assoc m (str ns-name) (get-meta fns))
-              ))))
+              (assoc m (str ns-name) (get-meta fns))))))
       (reduce m files)))
 
 (defn find-namespaces
@@ -86,7 +76,7 @@
   ^{:author "Chad Angelelli"
     :added "0.1.0"}
   [file ext]
-  (let [filter-fn (if (= ext 'cljs') cljs-file? cljc-file?)]
+  (let [filter-fn (if (= ext "cljs") cljs-file? cljc-file?)]
     [(str file)
      file
      (when (.isDirectory file)
