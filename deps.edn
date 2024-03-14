@@ -1,0 +1,24 @@
+{:project "li.angelel/docist"
+ :version "0.1"
+ :paths ["src"]
+
+ :deps {com.rpl/specter {:mvn/version "1.1.4"}
+        org.clojure/clojure {:mvn/version "1.11.2"}
+        org.clojure/tools.namespace {:mvn/version "1.5.0"}
+        rewrite-clj/rewrite-clj {:mvn/version "1.1.47"}}
+
+ :aliases
+ {:repl {:__usage__ "clojure -M:repl"
+         :extra-paths ["dev/script"
+                       "dev/src"
+                       "test"]
+         :extra-deps {com.bhauman/rebel-readline #:mvn{:version "0.1.4"}
+                      nrepl/nrepl {:mvn/version "1.0.0"}
+                      cider/cider-nrepl {:mvn/version "0.28.5"}}
+         :main-opts ["-m" "repl"]}
+
+  :test {:__usage__ "clj -M:test"
+         :extra-deps {babashka/fs {:mvn/version "0.2.12"}
+                      com.taoensso/carmine {:mvn/version "3.3.2"}
+                      lambdaisland/kaocha {:mvn/version "1.71.1119"}}
+         :main-opts ["-m" "kaocha.runner"]}}}
