@@ -46,6 +46,7 @@
               :doc "Core Docist entrypoint."
               :end-col 38
               :end-row 7
+              :file "src/docist/core.clj"
               :meta {:added "0.1" :author "Chad Angelelli"}
               :name 'docist.core
               :row 1
@@ -59,7 +60,7 @@
           n-total (count nodes)
           n-fn's (count (d/filter-nodes-by-type :defn nodes))
           n-var's (count (d/filter-nodes-by-type :def nodes))]
-      (is (= 14 n-total))
+      (is (= 22 n-total))
       (is (= 11 n-fn's))
       (is (= 2 n-var's))
       ))) ; end core-counts
@@ -80,6 +81,7 @@
               :row 1
               :col 1
               :end-row 3
+              :file "test/docist/sample_code/kitchen_sink.clj"
               :end-col 43}
              ns-node))
       ))) ; end kitchen-sink-ns
@@ -94,7 +96,7 @@
           n-method's (count (d/filter-nodes-by-type :defmethod nodes))
           n-macro's  (count (d/filter-nodes-by-type :defmacro nodes))
           n-once's   (count (d/filter-nodes-by-type :defonce nodes))]
-      (is (= 22 n-total))
+      (is (= 26 n-total))
       (is (= 5 n-fn's))
       (is (= 6 n-var's))
       (is (= 1 n-multi's))
@@ -111,6 +113,7 @@
                :doc "doc:var-public-meta-and-docstring"
                :end-col 7
                :end-row 47
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "1.0" :author "var-alpha"}
                :name var-public-meta-and-docstring
                :row 44
@@ -119,6 +122,7 @@
       (is (= '{:col 1
                :end-col 7
                :end-row 51
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "1.1" :author "var-bravo"}
                :name var-public-meta-no-docstring
                :row 49
@@ -128,6 +132,7 @@
                :doc "doc:var-public-docstring-no-meta"
                :end-col 7
                :end-row 55
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name var-public-docstring-no-meta
                :row 53
@@ -136,6 +141,7 @@
       (is (= '{:col 1
                :end-col 7
                :end-row 58
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name var-public-no-meta-no-docstring
                :row 57
@@ -145,6 +151,7 @@
                :doc "doc:var-public-doc-in-meta-object"
                :end-col 7
                :end-row 64
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "1.2" :author "var-charlie"}
                :name var-public-doc-in-meta-object
                :row 60
@@ -153,6 +160,7 @@
       (is (= '{:col 1
                :end-col 21
                :end-row 134
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name var-special-no-meta-with-map-as-value
                :row 133
@@ -169,6 +177,7 @@
                :doc "doc:macro-public-meta-and-docstring"
                :end-col 20
                :end-row 98
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "3.0" :author "macro-alpha"}
                :name macro-public-meta-and-docstring
                :row 94
@@ -178,6 +187,7 @@
                :col 1
                :end-col 20
                :end-row 103
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "3.1" :author "macro-bravo"}
                :name macro-public-meta-no-docstring
                :row 100
@@ -188,6 +198,7 @@
                :doc "doc:macro-public-docstring-no-meta"
                :end-col 20
                :end-row 108
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name macro-public-docstring-no-meta
                :row 105
@@ -197,6 +208,7 @@
                :col 1
                :end-col 20
                :end-row 112
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name macro-public-no-meta-no-docstring
                :row 110
@@ -207,6 +219,7 @@
                :doc "doc:macro-public-doc-in-meta-object"
                :end-col 20
                :end-row 119
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "3.2" :author "macro-charlie"}
                :name macro-public-doc-in-meta-object
                :row 114
@@ -222,6 +235,7 @@
                :doc "doc:multi-public-example1 "
                :end-col 12
                :end-row 79
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "2.0" :author "mutli-alpha"}
                :name multi-public-example1
                :row 76
@@ -237,6 +251,7 @@
                :doc "doc:multi-public-doc-in-meta"
                :end-col 37
                :end-row 87
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "2.1" :author "multi-bravo"}
                :name multi-public-example1
                :row 81
@@ -245,6 +260,7 @@
       (is (= '{:col 1
                :end-col 33
                :end-row 90
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name multi-public-example1
                :row 89
@@ -261,6 +277,7 @@
                :doc "doc:fn-public-meta-and-docstring"
                :end-col 17
                :end-row 11
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "0.1" :author "fn-alpha"}
                :name fn-public-meta-and-docstring
                :row 7
@@ -270,6 +287,7 @@
                :col 1
                :end-col 17
                :end-row 16
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "0.2" :author "fn-bravo"}
                :name fn-public-meta-no-docstring
                :row 13
@@ -280,6 +298,7 @@
                :doc "doc:fn-public-docstring-no-meta"
                :end-col 17
                :end-row 21
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name fn-public-docstring-no-meta
                :row 18
@@ -289,6 +308,7 @@
                :col 1
                :end-col 17
                :end-row 25
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name fn-public-no-meta-no-docstring
                :row 23
@@ -299,6 +319,7 @@
                :doc "doc:fn-public-doc-in-meta-object"
                :end-col 17
                :end-row 32
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "0.3" :author "fn-charlie"}
                :name fn-public-doc-in-meta-object
                :row 27
@@ -314,6 +335,7 @@
                :doc "doc:once-var-public-doc-in-meta-object"
                :end-col 7
                :end-row 127
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "1.3" :author "var-delta"}
                :name once-var-public-doc-in-meta-object
                :row 123
@@ -322,6 +344,7 @@
       (is (= '{:col 1
                :end-col 38
                :end-row 129
+               :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
                :name once-var-public-no-meta
                :row 129

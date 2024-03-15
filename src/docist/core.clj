@@ -192,10 +192,13 @@
   nodes as returned by `parse-node`."
   {:added "0.1" :author "Chad Angelelli"}
   ([file] (parse-namespace file default-parse-options))
-  ([file options]
+  ([file _]
    (try
      (let [zloc (z/of-file file {:track-position? true})
-           parsed (filter identity (map* parse-node zloc))
+           filepath (.getPath file)
+           parsed (filter identity
+                          (map* #(assoc (parse-node %) :file filepath)
+                                zloc))
            ns-sym (get-namespace-symbol parsed)]
        [{ns-sym parsed}])
      (catch Exception e
