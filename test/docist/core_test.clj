@@ -87,19 +87,21 @@
 
 (deftest kitchen-sink-counts-test
   (testing "Count number of parsed nodes in docist.sample-data.kitchen-sink"
-    (let [nodes      (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
-          n-total    (count nodes)
-          n-fn's     (count (d/filter-nodes-by-type :defn nodes))
-          n-var's    (count (d/filter-nodes-by-type :def nodes))
-          n-multi's  (count (d/filter-nodes-by-type :defmulti nodes))
-          n-method's (count (d/filter-nodes-by-type :defmethod nodes))
-          n-macro's  (count (d/filter-nodes-by-type :defmacro nodes))]
-      (is (= 19 n-total))
+    (let [nodes       (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+          n-total     (count nodes)
+          n-fn's      (count (d/filter-nodes-by-type :defn nodes))
+          n-var's     (count (d/filter-nodes-by-type :def nodes))
+          n-multi's   (count (d/filter-nodes-by-type :defmulti nodes))
+          n-method's  (count (d/filter-nodes-by-type :defmethod nodes))
+          n-macro's   (count (d/filter-nodes-by-type :defmacro nodes))
+          n-once's    (count (d/filter-nodes-by-type :defonce nodes))]
+      (is (= 21 n-total))
       (is (= 5 n-fn's))
       (is (= 5 n-var's))
       (is (= 1 n-multi's))
       (is (= 2 n-method's))
       (is (= 5 n-macro's))
+      (is (= 2 n-once's))
       ))) ; end kitchen-sink-counts-test
 
 (deftest kitchen-sink-def-forms-test
@@ -296,4 +298,27 @@
                :type :defn}
              (nth fns 4)))
     ))) ; end kitchen-sink-defn-forms-test
+
+(deftest kitchen-sink-defonce-forms-test
+  (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
+    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+          once's (d/filter-nodes-by-type :defonce nodes)]
+      (is (= '{:col 1
+               :doc "doc:once-var-public-doc-in-meta-object"
+               :end-col 7
+               :end-row 127
+               :meta {:added "1.3" :author "var-delta"}
+               :name once-var-public-doc-in-meta-object
+               :row 123
+               :type :defonce}
+             (first once's)))
+      (is (= '{:col 1
+               :end-col 38
+               :end-row 129
+               :meta nil
+               :name once-var-public-no-meta
+               :row 129
+               :type :defonce}
+             (second once's)))
+      ))) ; end kitchen-sink-defonce-forms-test
 

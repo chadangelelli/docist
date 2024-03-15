@@ -117,7 +117,8 @@
 
 (defn- -parse-defonce
   [zloc _]
-  )
+  {:type :defonce
+   :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-ns
   [zloc _]

@@ -118,3 +118,12 @@
   [a b]
   `(println ~a ~b))
 
+;;;; ___________________________________________ PUBLIC DEFONCE's
+
+(defonce ^{:added "1.3"
+           :author "var-delta"
+           :doc "doc:once-var-public-doc-in-meta-object"}
+  once-var-public-doc-in-meta-object
+  600)
+
+(defonce once-var-public-no-meta 600)
