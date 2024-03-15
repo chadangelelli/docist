@@ -24,7 +24,8 @@
 
 ;;;; ___________________________________________ PRIVATE FUNCTIONS
 
-(defn fn-private
+#_:clj-kondo/ignore
+(defn- fn-private
   "-- will never be parsed"
   [a b]
   (println a b))
@@ -51,3 +52,9 @@
   var-public-doc-in-meta-object
   500)
 
+;;;; ___________________________________________ PRIVATE VARS
+#_:clj-kondo/ignore
+(def ^:private
+  var-private
+  "-- will never be parsed"
+  600)
