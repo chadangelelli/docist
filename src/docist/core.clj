@@ -8,8 +8,12 @@
             [rewrite-clj.node :as n]
             [rewrite-clj.zip :as z]))
 
-(def ^{:added "0.1"
-       :author "Chad Angelelli"}
+(def ^{:added "0.1" :author "Chad Angelelli"}
+  node-types
+  "Parseable node type."
+  #{:def :defmacro :defmutli :defmethod :defn :defonce :ns})
+
+(def ^{:added "0.1" :author "Chad Angelelli"}
   default-parse-options
   "Default parser options."
   {:langs #{:clj :cljs :edn}})
@@ -76,7 +80,7 @@
 
 (defn- -parse-var
   [zloc _]
-  {:type :var
+  {:type :def
    :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defmacro
@@ -100,7 +104,7 @@
                       (take-while (complement z/end?))
                       (filter #(= (z/tag %) :vector))
                       (map z/sexpr))]
-    {:type :fn
+    {:type :defn
      :name fn-name
      :arglists arglists}))
 
@@ -216,3 +220,13 @@
        {:ast ast
         :errs (seq errs)
         :options options}))))
+
+(defn get-namespace-node
+  "Returns namespace node for `nodes` as returned from `parse-node`."
+  [nodes]
+  (first (filter #(= (:type %) :ns) nodes)))
+
+(defn filter-nodes-by-type
+  "Returns sequence after filtering `nodes` by `typ`."
+  [typ nodes]
+  (filter #(= (:type %) typ) nodes))
