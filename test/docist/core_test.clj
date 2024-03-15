@@ -2,7 +2,6 @@
   (:require [clojure.test :as t :refer [deftest is testing]]
             [docist.core :as d]))
 
-
 (def core-path "src/docist/core.clj")
 (def core-ast (atom nil))
 (def core-errs (atom nil))
@@ -32,7 +31,7 @@
 (deftest core-node-types
   (testing "docist.core/node-types"
     (is (= d/node-types
-           #{:def :defmacro :defmutli :defmethod :defn :defonce :ns}))
+           #{:def :defmacro :defmulti :defmethod :defn :defonce :ns}))
     )) ; core-node-types
 
 (deftest core-parse-errs

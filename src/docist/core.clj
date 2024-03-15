@@ -9,7 +9,7 @@
 (def ^{:added "0.1" :author "Chad Angelelli"}
   node-types
   "Parseable node type."
-  #{:def :defmacro :defmutli :defmethod :defn :defonce :ns})
+  #{:def :defmacro :defmulti :defmethod :defn :defonce :ns})
 
 (def ^{:added "0.1" :author "Chad Angelelli"}
   default-parse-options
