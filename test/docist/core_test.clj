@@ -87,17 +87,17 @@
 
 (deftest kitchen-sink-counts-test
   (testing "Count number of parsed nodes in docist.sample-data.kitchen-sink"
-    (let [nodes       (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
-          n-total     (count nodes)
-          n-fn's      (count (d/filter-nodes-by-type :defn nodes))
-          n-var's     (count (d/filter-nodes-by-type :def nodes))
-          n-multi's   (count (d/filter-nodes-by-type :defmulti nodes))
-          n-method's  (count (d/filter-nodes-by-type :defmethod nodes))
-          n-macro's   (count (d/filter-nodes-by-type :defmacro nodes))
-          n-once's    (count (d/filter-nodes-by-type :defonce nodes))]
-      (is (= 21 n-total))
+    (let [nodes      (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+          n-total    (count nodes)
+          n-fn's     (count (d/filter-nodes-by-type :defn nodes))
+          n-var's    (count (d/filter-nodes-by-type :def nodes))
+          n-multi's  (count (d/filter-nodes-by-type :defmulti nodes))
+          n-method's (count (d/filter-nodes-by-type :defmethod nodes))
+          n-macro's  (count (d/filter-nodes-by-type :defmacro nodes))
+          n-once's   (count (d/filter-nodes-by-type :defonce nodes))]
+      (is (= 22 n-total))
       (is (= 5 n-fn's))
-      (is (= 5 n-var's))
+      (is (= 6 n-var's))
       (is (= 1 n-multi's))
       (is (= 2 n-method's))
       (is (= 5 n-macro's))
@@ -151,6 +151,14 @@
                :row 60
                :type :def}
              (nth vars 4)))
+      (is (= '{:col 1
+               :end-col 21
+               :end-row 134
+               :meta nil
+               :name var-special-no-meta-with-map-as-value
+               :row 133
+               :type :def}
+             (nth vars 5)))
     ))) ; end kitchen-sink-def-forms-test
 
 (deftest kitchen-sink-defmacro-forms-test

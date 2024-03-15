@@ -14,7 +14,8 @@
 (def ^{:added "0.1" :author "Chad Angelelli"}
   default-parse-options
   "Default parser options."
-  {:langs #{:clj :cljs :edn}})
+  {:langs #{:clj :cljs}
+   :index-multimethods? true})
 
 (defn map*
   "Similar to `clojure.core/map`, except iterate over a zipper `zloc`. Uses
@@ -64,12 +65,16 @@
 (defn get-meta
   "Return metadata for form."
   {:added "0.1" :author "Chad Angelelli"}
-  [zloc]
+  [zloc typ]
   (let [m (->> zloc
                z/down
                (iterate z/right)
                (take-while (complement z/end?))
-               (filter #(some #{:meta :map} [(z/tag %)]))
+               (filter (fn [zloc]
+                         (let [tag (z/tag zloc)]
+                           (and (some #{:meta :map} [tag])
+                                (or (= typ :ns)
+                                    (not (z/rightmost? zloc)))))))
                (map -process-meta)
                first)]
     (if (contains? m :doc)
@@ -157,7 +162,7 @@
      (let [typ (-> zloc z/down z/sexpr str keyword)
            loc (meta (z/node zloc))
            doc-map (get-docstring zloc typ)
-           meta-map (get-meta zloc)
+           meta-map (get-meta zloc typ)
            private? (get-in meta-map [:meta :private])
            f (when-not private?
                (case typ

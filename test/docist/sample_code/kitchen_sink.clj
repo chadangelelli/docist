@@ -127,3 +127,9 @@
   600)
 
 (defonce once-var-public-no-meta 600)
+
+;;;; ___________________________________________ SPECIAL CASES
+
+(def var-special-no-meta-with-map-as-value
+  {:actual :values})
+
