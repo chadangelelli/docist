@@ -155,7 +155,54 @@
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
     (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
           macros (d/filter-nodes-by-type :defmacro nodes)]
-      (is (= 1 1))
+      (is (= '{:arglists ([a b])
+               :col 1
+               :doc "doc:macro-public-meta-and-docstring"
+               :end-col 20
+               :end-row 98
+               :meta {:added "3.0" :author "macro-alpha"}
+               :name macro-public-meta-and-docstring
+               :row 94
+               :type :defmacro}
+             (first macros)))
+      (is (= '{:arglists ([a b])
+               :col 1
+               :end-col 20
+               :end-row 103
+               :meta {:added "3.1" :author "macro-bravo"}
+               :name macro-public-meta-no-docstring
+               :row 100
+               :type :defmacro}
+             (second macros)))
+      (is (= '{:arglists ([a b])
+               :col 1
+               :doc "doc:macro-public-docstring-no-meta"
+               :end-col 20
+               :end-row 108
+               :meta nil
+               :name macro-public-docstring-no-meta
+               :row 105
+               :type :defmacro}
+             (nth macros 2)))
+      (is (= '{:arglists ([a b])
+               :col 1
+               :end-col 20
+               :end-row 112
+               :meta nil
+               :name macro-public-no-meta-no-docstring
+               :row 110
+               :type :defmacro}
+             (nth macros 3)))
+      (is (= '{:arglists ([a b])
+               :col 1
+               :doc "doc:macro-public-doc-in-meta-object"
+               :end-col 20
+               :end-row 119
+               :meta {:added "3.2" :author "macro-charlie"}
+               :name macro-public-doc-in-meta-object
+               :row 114
+               :type :defmacro}
+             (nth macros 4)))
       ))) ; end kitchen-sink-defmacro-forms-test
 
 (deftest kitchen-sink-defmulti-forms-test
