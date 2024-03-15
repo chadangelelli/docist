@@ -1,10 +1,8 @@
 (ns docist.core
   "Core Docist entrypoint."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
-            [docist.fmt :as fmt :refer [echo]]
             [rewrite-clj.node :as n]
             [rewrite-clj.zip :as z]))
 
@@ -21,8 +19,7 @@
 (defn map*
   "Similar to `clojure.core/map`, except iterate over a zipper `zloc`. Uses
   `rewrite-clj.zip/right` for iteration."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   [f zloc]
   (->> zloc
        (iterate z/right)
@@ -31,8 +28,7 @@
 
 (defn get-files
   "Returns sequence of absolute paths to parse."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   ([path] (get-files path default-parse-options))
   ([path {:keys [langs]}]
    (let [f (io/file path)
@@ -43,20 +39,20 @@
           (filter #(re-find ext (.getPath %)))))))
 
 (defn get-docstring
-  "Returns docstring for node. Will find `:doc` key in meta or string for
-  docstring position."
-  {:added "0.1"
-   :author "Chad Angelelli"}
-  [zloc]
-  (when-let [ds (or (-> zloc z/down (z/find-next-token #(string? (z/sexpr %))))
-                    (-> zloc z/down (z/find-next-tag :multi-line)))]
-    (z/sexpr ds)))
+  "Returns map of `{:doc string?}` for node, or `nil`."
+  {:added "0.1" :author "Chad Angelelli"}
+  [zloc typ]
+  (when (not (some #{:defmethod :defonce} [typ]))
+    (let [doc (or (-> zloc z/down (z/find-next-token #(string? (z/sexpr %))))
+                  (-> zloc z/down (z/find-next-tag :multi-line)))]
+      (when doc
+        {:doc (z/sexpr doc)}))))
 
 (defn- -process-meta
   "Returns metadata as a consistent map. Called from `-get-meta`.
 
-  See also: `-get-meta`."
-  {:author "Chad A." :added "0.1"}
+  See also: `get-meta`."
+  {:added "0.1" :author "Chad Angelelli"}
   [zloc]
   (case (z/tag zloc)
     :map (z/sexpr zloc)
@@ -67,45 +63,56 @@
 
 (defn get-meta
   "Return metadata for form."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   [zloc]
-  (->> zloc
-       z/down
-       (iterate z/right)
-       (take-while (complement z/end?))
-       (filter #(some #{:meta :map} [(z/tag %)]))
-       (map -process-meta)
-       first))
+  (let [m (->> zloc
+               z/down
+               (iterate z/right)
+               (take-while (complement z/end?))
+               (filter #(some #{:meta :map} [(z/tag %)]))
+               (map -process-meta)
+               first)]
+    (if (contains? m :doc)
+      {:doc (:doc m) :meta (dissoc m :doc)}
+      {:meta m})))
 
-(defn- -parse-var
+(defn- -parse-def
   [zloc _]
   {:type :def
    :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defmacro
   [zloc _]
-  )
+  (let [arglists (->> zloc
+                      z/down
+                      (iterate z/right)
+                      (take-while (complement z/end?))
+                      (filter #(= (z/tag %) :vector))
+                      (map z/sexpr))]
+    {:type :defmacro
+     :name (-> zloc z/down z/right z/sexpr)
+     :arglists arglists}))
 
 (defn- -parse-defmulti
   [zloc _]
-  )
+  {:type :defmulti
+   :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defmethod
   [zloc _]
-  )
+  {:type :defmethod
+   :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defn
   [zloc _]
-  (let [fn-name (-> zloc z/down z/right z/sexpr)
-        arglists (->> zloc
+  (let [arglists (->> zloc
                       z/down
                       (iterate z/right)
                       (take-while (complement z/end?))
                       (filter #(= (z/tag %) :vector))
                       (map z/sexpr))]
     {:type :defn
-     :name fn-name
+     :name (-> zloc z/down z/right z/sexpr)
      :arglists arglists}))
 
 (defn- -parse-defonce
@@ -142,43 +149,42 @@
 
   If `:type` is `:fn`, `:method` or `:macro`, additionally `:arglists`
   will be added."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   ([zloc] (parse-node zloc default-parse-options))
   ([zloc options]
    (when (z/list? zloc)
-     (let [typ (-> zloc z/down z/sexpr str)
+     (let [typ (-> zloc z/down z/sexpr str keyword)
            loc (meta (z/node zloc))
-           doc-map {:doc (get-docstring zloc)}
-           meta-map {:meta (get-meta zloc)}
-           f (case (keyword typ)
-               :def       -parse-var
-               :defmacro  -parse-defmacro
-               :defmutli  -parse-defmulti
-               :defmethod -parse-defmethod
-               :defn      -parse-defn
-               :defonce   -parse-defonce
-               :ns        -parse-ns
-               nil)]
+           doc-map (get-docstring zloc typ)
+           meta-map (get-meta zloc)
+           private? (get-in meta-map [:meta :private])
+           f (when-not private?
+               (case typ
+                 :def       -parse-def
+                 :defmacro  -parse-defmacro
+                 :defmulti  -parse-defmulti
+                 :defmethod -parse-defmethod
+                 :defn      -parse-defn
+                 :defonce   -parse-defonce
+                 :ns        -parse-ns
+                 nil))]
        (when f
          (merge (f zloc options)
-                doc-map
                 meta-map
+                doc-map
                 loc))))))
 
 (defn get-namespace-symbol
   "Returns namespace as symbol from result of `parse-namespace`. Automatically
   called from `parse-namespace` for constructing AST."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   [parsed]
   (:name (first (filter #(= (:type %) :ns) parsed))))
 
 (defn parse-namespace
   "Returns map of `{NAMESPACE-SYMBOL PARSED}` where `PARSED` is a sequence of
   nodes as returned by `parse-node`."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   ([file] (parse-namespace file default-parse-options))
   ([file options]
    (try
@@ -192,8 +198,7 @@
 (defn parse-namespaces
   "Parses all namespaces for `files` by calling `parse-namespace` on each.
   Returns vector of `[All-PARSED-NAMESPACES ?ERRORS]`."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   ([files] (parse-namespaces files default-parse-options))
   ([files options]
    (loop [[file & rest-files] files, out {}, errs []]
@@ -207,8 +212,7 @@
 (defn parse
   "Takes a seqable of paths as strings or file objects (file or directory)
   and returns a map of `{:ast {...}, :errs [...], :options OPTIONS}`."
-  {:added "0.1"
-   :author "Chad Angelelli"}
+  {:added "0.1" :author "Chad Angelelli"}
   ([paths] (parse paths default-parse-options))
   ([paths options]
    (loop [[path & rest-paths] paths, ast {}, errs []]
