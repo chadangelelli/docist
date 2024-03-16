@@ -81,22 +81,47 @@
       {:doc (:doc m) :meta (dissoc m :doc)}
       {:meta m})))
 
+(defn- -get-arglists
+  [zloc]
+  (let [first-seq-zloc (-> zloc
+                           z/down
+                           (z/find-next #(some #{:list :vector} [(z/tag %)])))]
+    (case (z/tag first-seq-zloc)
+      :vector (conj () (z/sexpr first-seq-zloc))
+      :list (loop [zloc (-> zloc
+                            z/down
+                            z/right
+                            (z/find-next #(= (z/tag %) :list))
+                            z/left)
+                   arglists []]
+              (if (z/end? zloc)
+                (seq arglists)
+                (let [arglist (-> zloc
+                                  (z/find-next #(= (z/tag %) :list))
+                                  z/sexpr
+                                  first)]
+                  (recur (z/right zloc)
+                         (if arglist
+                           (conj arglists arglist)
+                           arglists)))))
+      nil)))
+
 (defn- -parse-def
   [zloc _]
   {:type :def
    :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defmacro
+  "
+
+  ;; WORKING NAVIGATOR for 1-ARITY TO arglists (:vector tag)
+  (-> zloc z/down (z/find-next #(= (z/tag %) :vector)) z/node)
+
+  "
   [zloc _]
-  (let [arglists (->> zloc
-                      z/down
-                      (iterate z/right)
-                      (take-while (complement z/end?))
-                      (filter #(= (z/tag %) :vector))
-                      (map z/sexpr))]
-    {:type :defmacro
-     :name (-> zloc z/down z/right z/sexpr)
-     :arglists arglists}))
+  {:type :defmacro
+   :name (-> zloc z/down z/right z/sexpr)
+   :arglists (-get-arglists zloc)})
 
 (defn- -parse-defmulti
   [zloc _]
@@ -110,15 +135,9 @@
 
 (defn- -parse-defn
   [zloc _]
-  (let [arglists (->> zloc
-                      z/down
-                      (iterate z/right)
-                      (take-while (complement z/end?))
-                      (filter #(= (z/tag %) :vector))
-                      (map z/sexpr))]
-    {:type :defn
-     :name (-> zloc z/down z/right z/sexpr)
-     :arglists arglists}))
+  {:type :defn
+   :name (-> zloc z/down z/right z/sexpr)
+   :arglists (-get-arglists zloc)})
 
 (defn- -parse-defonce
   [zloc _]

@@ -120,16 +120,51 @@
 
 ;;;; ___________________________________________ PUBLIC DEFONCE's
 
-(defonce ^{:added "1.3"
+(defonce ^{:added "4.0"
            :author "var-delta"
            :doc "doc:once-var-public-doc-in-meta-object"}
   once-var-public-doc-in-meta-object
   600)
 
-(defonce once-var-public-no-meta 600)
+(defonce once-var-public-no-meta 700)
 
 ;;;; ___________________________________________ SPECIAL CASES
 
 (def var-special-no-meta-with-map-as-value
   {:actual :values})
 
+(defn fn-special-empty-arglists-meta-and-docstring
+  "doc:fn-special-empty-arglists-meta-and-docstring"
+  {:added "5.0" :author "fn-special-alpha"}
+  []
+  [:this [:should [:not [:show :up]]]])
+
+(defn fn-special-empty-arglists-meta-no-docstring
+  {:added "5.1" :author "fn-special-bravo"}
+  []
+  [:this [:should [:not [:show :up]]]])
+
+(defn fn-special-empty-arglists-no-meta
+  []
+  [:this [:should [:not [:show :up]]]])
+
+(defn fn-special-multi-arity-arglists-meta-and-docstring
+  "doc:fn-special-multi-arity-arglists-meta-and-docstring"
+  {:added "5.0" :author "fn-special-alpha"}
+  ([]
+   [:this [:should [:not [:show :up]]]])
+  ([a b]
+   [:this [:should [:not [:show :up [a b]]]]]))
+
+(defn fn-special-multi-arity-arglists-meta-no-docstring
+  {:added "5.1" :author "fn-special-bravo"}
+  ([]
+   [:this [:should [:not [:show :up]]]])
+  ([a b]
+   [:this [:should [:not [:show :up [a b]]]]]))
+
+(defn fn-special-multi-arity-arglists-no-meta
+  ([]
+   [:this [:should [:not [:show :up]]]])
+  ([a b]
+   [:this [:should [:not [:show :up [a b]]]]]))

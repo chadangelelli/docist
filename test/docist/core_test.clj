@@ -1,6 +1,7 @@
 (ns docist.core-test
   (:require [clojure.test :as t :refer [deftest is testing]]
-            [docist.core :as d]))
+            [docist.core :as d]
+            [docist.fmt :as fmt]))
 
 (def core-path "src/docist/core.clj")
 (def core-ast (atom nil))
@@ -60,7 +61,7 @@
           n-total (count nodes)
           n-fn's (count (d/filter-nodes-by-type :defn nodes))
           n-var's (count (d/filter-nodes-by-type :def nodes))]
-      (is (= 22 n-total))
+      (is (= 23 n-total))
       (is (= 11 n-fn's))
       (is (= 2 n-var's))
       ))) ; end core-counts
@@ -96,8 +97,8 @@
           n-method's (count (d/filter-nodes-by-type :defmethod nodes))
           n-macro's  (count (d/filter-nodes-by-type :defmacro nodes))
           n-once's   (count (d/filter-nodes-by-type :defonce nodes))]
-      (is (= 26 n-total))
-      (is (= 5 n-fn's))
+      (is (= 32 n-total))
+      (is (= 11 n-fn's))
       (is (= 6 n-var's))
       (is (= 1 n-multi's))
       (is (= 2 n-method's))
@@ -325,6 +326,68 @@
                :row 27
                :type :defn}
              (nth fns 4)))
+      (is (= '{:arglists ([])
+               :col 1
+               :doc "doc:fn-special-empty-arglists-meta-and-docstring"
+               :end-col 40
+               :end-row 140
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta {:added "5.0" :author "fn-special-alpha"}
+               :name fn-special-empty-arglists-meta-and-docstring
+               :row 136
+               :type :defn}
+             (nth fns 5)))
+      (is (= '{:arglists ([])
+               :col 1
+               :end-col 40
+               :end-row 145
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta {:added "5.1" :author "fn-special-bravo"}
+               :name fn-special-empty-arglists-meta-no-docstring
+               :row 142
+               :type :defn}
+             (nth fns 6)))
+      (is (= '{:arglists ([])
+               :col 1
+               :end-col 40
+               :end-row 149
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta nil
+               :name fn-special-empty-arglists-no-meta
+               :row 147
+               :type :defn}
+             (nth fns 7)))
+      (is (= '{:arglists ([] [a b])
+               :col 1
+               :doc "doc:fn-special-multi-arity-arglists-meta-and-docstring"
+               :end-col 48
+               :end-row 157
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta {:added "5.0" :author "fn-special-alpha"}
+               :name fn-special-multi-arity-arglists-meta-and-docstring
+               :row 151
+               :type :defn}
+             (nth fns 8)))
+      (is (= '{:arglists ([] [a b])
+               :col 1
+               :end-col 48
+               :end-row 164
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta {:added "5.1" :author "fn-special-bravo"}
+               :name fn-special-multi-arity-arglists-meta-no-docstring
+               :row 159
+               :type :defn}
+             (nth fns 9)))
+      (is (= '{:arglists ([] [a b])
+               :col 1
+               :end-col 48
+               :end-row 170
+               :file "test/docist/sample_code/kitchen_sink.clj"
+               :meta nil
+               :name fn-special-multi-arity-arglists-no-meta
+               :row 166
+               :type :defn}
+             (nth fns 10)))
     ))) ; end kitchen-sink-defn-forms-test
 
 (deftest kitchen-sink-defonce-forms-test
@@ -336,7 +399,7 @@
                :end-col 7
                :end-row 127
                :file "test/docist/sample_code/kitchen_sink.clj"
-               :meta {:added "1.3" :author "var-delta"}
+               :meta {:added "4.0" :author "var-delta"}
                :name once-var-public-doc-in-meta-object
                :row 123
                :type :defonce}
@@ -351,4 +414,3 @@
                :type :defonce}
              (second once's)))
       ))) ; end kitchen-sink-defonce-forms-test
-
