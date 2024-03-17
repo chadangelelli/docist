@@ -121,6 +121,7 @@
                :type :def}
              (first vars)))
       (is (= '{:col 1
+               :doc nil
                :end-col 7
                :end-row 51
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -140,6 +141,7 @@
                :type :def}
              (nth vars 2)))
       (is (= '{:col 1
+               :doc nil
                :end-col 7
                :end-row 58
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -159,6 +161,7 @@
                :type :def}
              (nth vars 4)))
       (is (= '{:col 1
+               :doc nil
                :end-col 21
                :end-row 134
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -173,7 +176,7 @@
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
     (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
           macros (d/filter-nodes-by-type :defmacro nodes)]
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([m n])
                :col 1
                :doc "doc:macro-public-meta-and-docstring"
                :end-col 20
@@ -184,8 +187,9 @@
                :row 94
                :type :defmacro}
              (first macros)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([o p])
                :col 1
+               :doc nil
                :end-col 20
                :end-row 103
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -194,7 +198,7 @@
                :row 100
                :type :defmacro}
              (second macros)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([q r])
                :col 1
                :doc "doc:macro-public-docstring-no-meta"
                :end-col 20
@@ -205,8 +209,9 @@
                :row 105
                :type :defmacro}
              (nth macros 2)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([s t])
                :col 1
+               :doc nil
                :end-col 20
                :end-row 112
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -215,7 +220,7 @@
                :row 110
                :type :defmacro}
              (nth macros 3)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([u v])
                :col 1
                :doc "doc:macro-public-doc-in-meta-object"
                :end-col 20
@@ -259,6 +264,7 @@
                :type :defmethod}
              (first method's)))
       (is (= '{:col 1
+               :doc nil
                :end-col 33
                :end-row 90
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -284,8 +290,9 @@
                :row 7
                :type :defn}
              (first fns)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([c d])
                :col 1
+               :doc nil
                :end-col 17
                :end-row 16
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -294,7 +301,7 @@
                :row 13
                :type :defn}
              (second fns)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([e f])
                :col 1
                :doc "doc:fn-public-docstring-no-meta"
                :end-col 17
@@ -305,8 +312,9 @@
                :row 18
                :type :defn}
              (nth fns 2)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([g h])
                :col 1
+               :doc nil
                :end-col 17
                :end-row 25
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -315,7 +323,7 @@
                :row 23
                :type :defn}
                (nth fns 3)))
-      (is (= '{:arglists ([a b])
+      (is (= '{:arglists ([i j])
                :col 1
                :doc "doc:fn-public-doc-in-meta-object"
                :end-col 17
@@ -339,6 +347,7 @@
              (nth fns 5)))
       (is (= '{:arglists ([])
                :col 1
+               :doc nil
                :end-col 40
                :end-row 145
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -349,6 +358,7 @@
              (nth fns 6)))
       (is (= '{:arglists ([])
                :col 1
+               :doc nil
                :end-col 40
                :end-row 149
                :file "test/docist/sample_code/kitchen_sink.clj"
@@ -357,10 +367,10 @@
                :row 147
                :type :defn}
              (nth fns 7)))
-      (is (= '{:arglists ([] [a b])
+      (is (= '{:arglists ([] [aa bb])
                :col 1
                :doc "doc:fn-special-multi-arity-arglists-meta-and-docstring"
-               :end-col 48
+               :end-col 50
                :end-row 157
                :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "5.0" :author "fn-special-alpha"}
@@ -368,9 +378,10 @@
                :row 151
                :type :defn}
              (nth fns 8)))
-      (is (= '{:arglists ([] [a b])
+      (is (= '{:arglists ([] [cc dd])
                :col 1
-               :end-col 48
+               :doc nil
+               :end-col 50
                :end-row 164
                :file "test/docist/sample_code/kitchen_sink.clj"
                :meta {:added "5.1" :author "fn-special-bravo"}
@@ -378,9 +389,10 @@
                :row 159
                :type :defn}
              (nth fns 9)))
-      (is (= '{:arglists ([] [a b])
+      (is (= '{:arglists ([] [ee ff])
+               :doc nil
                :col 1
-               :end-col 48
+               :end-col 50
                :end-row 170
                :file "test/docist/sample_code/kitchen_sink.clj"
                :meta nil
@@ -405,6 +417,7 @@
                :type :defonce}
              (first once's)))
       (is (= '{:col 1
+               :doc nil
                :end-col 38
                :end-row 129
                :file "test/docist/sample_code/kitchen_sink.clj"

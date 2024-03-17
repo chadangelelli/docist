@@ -12,32 +12,32 @@
 
 (defn fn-public-meta-no-docstring
   {:added "0.2" :author "fn-bravo"}
-  [a b]
-  (println a b))
+  [c d]
+  (println c d))
 
 (defn fn-public-docstring-no-meta
   "doc:fn-public-docstring-no-meta"
-  [a b]
-  (println a b))
+  [e f]
+  (println e f))
 
 (defn fn-public-no-meta-no-docstring
-  [a b]
-  (println a b))
+  [g h]
+  (println g h))
 
 (defn ^{:added "0.3"
         :author "fn-charlie"
         :doc "doc:fn-public-doc-in-meta-object"}
   fn-public-doc-in-meta-object
-  [a b]
-  (println a b))
+  [i j]
+  (println i j))
 
 ;;;; ___________________________________________ PRIVATE FUNCTIONS
 
 #_:clj-kondo/ignore
 (defn- fn-private
   "-- will never be included in AST"
-  [a b]
-  (println a b))
+  [k l]
+  (println k l))
 
 ;;;; ___________________________________________ PUBLIC VARS
 
@@ -94,29 +94,29 @@
 (defmacro macro-public-meta-and-docstring
   "doc:macro-public-meta-and-docstring"
   {:added "3.0" :author "macro-alpha"}
-  [a b]
-  `(println ~a ~b))
+  [m n]
+  `(println ~m ~n))
 
 (defmacro macro-public-meta-no-docstring
   {:added "3.1" :author "macro-bravo"}
-  [a b]
-  `(println ~a ~b))
+  [o p]
+  `(println ~o ~p))
 
 (defmacro macro-public-docstring-no-meta
   "doc:macro-public-docstring-no-meta"
-  [a b]
-  `(println ~a ~b))
+  [q r]
+  `(println ~q ~r))
 
 (defmacro macro-public-no-meta-no-docstring
-  [a b]
-  `(println ~a ~b))
+  [s t]
+  `(println ~s ~t))
 
 (defmacro ^{:added "3.2"
         :author "macro-charlie"
         :doc "doc:macro-public-doc-in-meta-object"}
   macro-public-doc-in-meta-object
-  [a b]
-  `(println ~a ~b))
+  [u v]
+  `(println ~u ~v))
 
 ;;;; ___________________________________________ PUBLIC DEFONCE's
 
@@ -153,18 +153,18 @@
   {:added "5.0" :author "fn-special-alpha"}
   ([]
    [:this [:should [:not [:show :up]]]])
-  ([a b]
-   [:this [:should [:not [:show :up [a b]]]]]))
+  ([aa bb]
+   [:this [:should [:not [:show :up [aa bb]]]]]))
 
 (defn fn-special-multi-arity-arglists-meta-no-docstring
   {:added "5.1" :author "fn-special-bravo"}
   ([]
    [:this [:should [:not [:show :up]]]])
-  ([a b]
-   [:this [:should [:not [:show :up [a b]]]]]))
+  ([cc dd]
+   [:this [:should [:not [:show :up [cc dd]]]]]))
 
 (defn fn-special-multi-arity-arglists-no-meta
   ([]
    [:this [:should [:not [:show :up]]]])
-  ([a b]
-   [:this [:should [:not [:show :up [a b]]]]]))
+  ([ee ff]
+   [:this [:should [:not [:show :up [ee ff]]]]]))

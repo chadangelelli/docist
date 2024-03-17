@@ -47,7 +47,7 @@
     (let [doc (or (-> zloc z/down (z/find-next-token #(string? (z/sexpr %))))
                   (-> zloc z/down (z/find-next-tag :multi-line)))]
       (when doc
-        {:doc (z/sexpr doc)}))))
+        (z/sexpr doc)))))
 
 (defn- -process-meta
   "Returns metadata as a consistent map. Called from `-get-meta`.
@@ -66,20 +66,17 @@
   "Return metadata for form."
   {:added "0.1" :author "Chad Angelelli"}
   [zloc typ]
-  (let [m (->> zloc
-               z/down
-               (iterate z/right)
-               (take-while (complement z/end?))
-               (filter (fn [zloc]
-                         (let [tag (z/tag zloc)]
-                           (and (some #{:meta :map} [tag])
-                                (or (= typ :ns)
-                                    (not (z/rightmost? zloc)))))))
-               (map -process-meta)
-               first)]
-    (if (contains? m :doc)
-      {:doc (:doc m) :meta (dissoc m :doc)}
-      {:meta m})))
+  (->> zloc
+       z/down
+       (iterate z/right)
+       (take-while (complement z/end?))
+       (filter (fn [zloc]
+                 (let [tag (z/tag zloc)]
+                   (and (some #{:meta :map} [tag])
+                        (or (= typ :ns)
+                            (not (z/rightmost? zloc)))))))
+       (map -process-meta)
+       first))
 
 (defn- -get-arglists
   [zloc]
@@ -179,25 +176,30 @@
   ([zloc options]
    (when (z/list? zloc)
      (let [typ (-> zloc z/down z/sexpr str keyword)
-           loc (meta (z/node zloc))
-           doc-map (get-docstring zloc typ)
            meta-map (get-meta zloc typ)
-           private? (get-in meta-map [:meta :private])
-           f (when-not private?
-               (case typ
-                 :def       -parse-def
-                 :defmacro  -parse-defmacro
-                 :defmulti  -parse-defmulti
-                 :defmethod -parse-defmethod
-                 :defn      -parse-defn
-                 :defonce   -parse-defonce
-                 :ns        -parse-ns
-                 nil))]
-       (when f
-         (merge (f zloc options)
-                meta-map
-                doc-map
-                loc))))))
+           parse-node* (when-not (:private meta-map)
+                         (case typ
+                           :def       -parse-def
+                           :defmacro  -parse-defmacro
+                           :defmulti  -parse-defmulti
+                           :defmethod -parse-defmethod
+                           :defn      -parse-defn
+                           :defonce   -parse-defonce
+                           :ns        -parse-ns
+                           nil))]
+       (when parse-node*
+         (let [parsed (parse-node* zloc options)
+               ?meta-doc (:doc meta-map)
+               meta-map {:meta (if ?meta-doc
+                                 (dissoc meta-map :doc)
+                                 meta-map)}
+               docstring (get-docstring zloc typ)
+               doc-map {:doc (or docstring ?meta-doc nil)}
+               loc (meta (z/node zloc))]
+           (merge parsed
+                  meta-map
+                  doc-map
+                  loc)))))))
 
 (defn get-namespace-symbol
   "Returns namespace as symbol from result of `parse-namespace`. Automatically
@@ -238,8 +240,8 @@
        [out (seq errs)]))))
 
 (defn parse
-  "Takes a seqable of paths as strings or file objects (file or directory)
-  and returns a map of `{:ast {...}, :errs [...], :options OPTIONS}`."
+  "Takes a seqable of paths (as strings, files or directories) and
+  returns a map of `{:ast {...}, :errs [...], :options OPTIONS}`."
   {:added "0.1" :author "Chad Angelelli"}
   ([paths] (parse paths default-parse-options))
   ([paths options]
