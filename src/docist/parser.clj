@@ -1,8 +1,11 @@
-(ns docist.core
-  "Core Docist entrypoint."
+(ns docist.parser
+  "Docist parser. Depending on your needs, it's possible all you need is
+  `(docist.parser/parse files)` as all other functionality in this library is
+  lower level."
   {:added "0.1" :author "Chad Angelelli"}
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
+            [docist.util :as u]
             [rewrite-clj.node :as n]
             [rewrite-clj.zip :as z]))
 
@@ -15,17 +18,7 @@
   default-parse-options
   "Default parser options."
   {:langs #{:clj :cljs}
-   :index-multimethods? true})
-
-(defn map*
-  "Similar to `clojure.core/map`, except iterate over a zipper `zloc`. Uses
-  `rewrite-clj.zip/right` for iteration."
-  {:added "0.1" :author "Chad Angelelli"}
-  [f zloc]
-  (->> zloc
-       (iterate z/right)
-       (take-while (complement z/end?))
-       (map f)))
+   :index-multimethods? true}) ;TODO: add defmulti/defmethods grouping
 
 (defn get-files
   "Returns sequence of absolute paths to parse."
@@ -218,8 +211,8 @@
      (let [zloc (z/of-file file {:track-position? true})
            filepath (.getPath file)
            parsed (filter identity
-                          (map* #(assoc (parse-node %) :file filepath)
-                                zloc))
+                          (u/map* #(assoc (parse-node %) :file filepath)
+                                  zloc))
            ns-sym (get-namespace-symbol parsed)]
        [{ns-sym parsed}])
      (catch Exception e
@@ -259,8 +252,3 @@
   "Returns namespace node for `nodes` as returned from `parse-node`."
   [nodes]
   (first (filter #(= (:type %) :ns) nodes)))
-
-(defn filter-nodes-by-type
-  "Returns sequence after filtering `nodes` by `typ`."
-  [typ nodes]
-  (filter #(= (:type %) typ) nodes))
