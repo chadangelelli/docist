@@ -232,6 +232,7 @@
                 (if ?err (conj errs ?err) errs)))
        [out (seq errs)]))))
 
+;;TODO: add Malli validation
 (defn parse
   "Takes a seqable of paths (as strings, files or directories) and
   returns a map of `{:ast {...}, :errs [...], :options OPTIONS}`."

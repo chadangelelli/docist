@@ -1,33 +1,12 @@
 (ns docist.parser-test
   (:require [clojure.test :as t :refer [deftest is testing]]
             [docist.parser :as d]
+            [docist.test-util :as test-util]
             [docist.util :as u]))
 
-(def parser-path "src/docist/parser.clj")
-(def parser-ast (atom nil))
-(def parser-errs (atom nil))
-
-(def kitchen-sink-path "test/docist/sample_code/kitchen_sink.clj")
-(def kitchen-sink-ast (atom nil))
-(def kitchen-sink-errs (atom nil))
-
-(defn parse-parser
-  [f]
-  (let [{:keys [ast errs]} (d/parse [parser-path])]
-    (reset! parser-ast ast)
-    (reset! parser-errs errs)
-    (f)))
-
-(defn parse-kitchen-sink
-  [f]
-  (let [{:keys [ast errs]} (d/parse [kitchen-sink-path])]
-    (reset! kitchen-sink-ast ast)
-    (reset! kitchen-sink-errs errs)
-    (f)))
-
 (t/use-fixtures :once
-                parse-parser
-                parse-kitchen-sink)
+                test-util/parse-parser
+                test-util/parse-kitchen-sink)
 
 (deftest parser-node-types
   (testing "docist.parser/node-types"
@@ -37,12 +16,13 @@
 
 (deftest parser-parse-errs
   (testing "No errors from parsing docist.parser"
-    (is (nil? @parser-errs))
+    (is (nil? @test-util/parser-errs))
     )) ; parser-parse-errs
 
 (deftest parser-ns
   (testing "Basic parse of Docist parser `ns` tag."
-    (let [ns-node (d/get-namespace-node (get @parser-ast 'docist.parser))]
+    (let [ns-node (d/get-namespace-node (get @test-util/parser-ast
+                                             'docist.parser))]
       (is (= {:col 1
               :doc "Docist parser. Depending on your needs, it's possible all you need is\n  `(docist.parser/parse files)` as all other functionality in this library is\n  lower level."
               :end-col 38
@@ -57,7 +37,7 @@
 
 (deftest parser-counts
   (testing "Count number of parsed nodes in docist.parser"
-    (let [nodes (get @parser-ast 'docist.parser)
+    (let [nodes (get @test-util/parser-ast 'docist.parser)
           n-total (count nodes)
           n-fn's (count (u/filter-nodes-by-type :defn nodes))
           n-var's (count (u/filter-nodes-by-type :def nodes))]
@@ -68,12 +48,13 @@
 
 (deftest kitchen-sink-parse-errs
   (testing "No errors from parsing docist.sample-data.kitchen-sink"
-    (is (nil? @kitchen-sink-errs))
+    (is (nil? @test-util/kitchen-sink-errs))
     )) ; kitchen-sink-parse-errs
 
 (deftest kitchen-sink-ns
   (testing "Basic parse of docist.sample-data.kitchen-sink `ns` tag."
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           ns-node (d/get-namespace-node nodes)]
       (is (= {:name 'docist.sample-code.kitchen-sink
               :type :ns
@@ -89,7 +70,8 @@
 
 (deftest kitchen-sink-counts-test
   (testing "Count number of parsed nodes in docist.sample-data.kitchen-sink"
-    (let [nodes      (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes      (get @test-util/kitchen-sink-ast
+                          'docist.sample-code.kitchen-sink)
           n-total    (count nodes)
           n-fn's     (count (u/filter-nodes-by-type :defn nodes))
           n-var's    (count (u/filter-nodes-by-type :def nodes))
@@ -108,7 +90,8 @@
 
 (deftest kitchen-sink-def-forms-test
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           vars (u/filter-nodes-by-type :def nodes)]
       (is (= '{:col 1
                :doc "doc:var-public-meta-and-docstring"
@@ -174,7 +157,8 @@
 
 (deftest kitchen-sink-defmacro-forms-test
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           macros (u/filter-nodes-by-type :defmacro nodes)]
       (is (= '{:arglists ([m n])
                :col 1
@@ -235,7 +219,8 @@
 
 (deftest kitchen-sink-defmulti-forms-test
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           multis (u/filter-nodes-by-type :defmulti nodes)]
       (is (= '{:col 1
                :doc "doc:multi-public-example1 "
@@ -251,7 +236,8 @@
 
 (deftest kitchen-sink-defmethod-forms-test
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           method's (u/filter-nodes-by-type :defmethod nodes)]
       (is (= '{:col 1
                :doc "doc:multi-public-doc-in-meta"
@@ -277,7 +263,8 @@
 
 (deftest kitchen-sink-defn-forms-test
   (testing "Test defn forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           fns (u/filter-nodes-by-type :defn nodes)]
       (is (= '{:arglists ([a b])
                :col 1
@@ -404,7 +391,8 @@
 
 (deftest kitchen-sink-defonce-forms-test
   (testing "Test def forms for equality in docist.sample-data.kitchen-sink"
-    (let [nodes (get @kitchen-sink-ast 'docist.sample-code.kitchen-sink)
+    (let [nodes (get @test-util/kitchen-sink-ast
+                     'docist.sample-code.kitchen-sink)
           once's (u/filter-nodes-by-type :defonce nodes)]
       (is (= '{:col 1
                :doc "doc:once-var-public-doc-in-meta-object"

@@ -17,3 +17,11 @@
   "Returns sequence after filtering `nodes` by `typ`."
   [typ nodes]
   (filter #(= (:type %) typ) nodes))
+
+(defn split-namespace-and-symbols
+  "Returns map of `{:ns NS-NODE :symbols REMAINING-NODES}`."
+  {:added "0.1" :author "Chad Angelelli"}
+  [nodes]
+  (letfn [(ns-type [node] (= (:type node) :ns))]
+    {:ns (first (filter ns-type nodes))
+     :symbols (remove ns-type nodes)}))
