@@ -15,7 +15,7 @@
 
 {{ns.doc}}
 
-### Location & Metadata
+##### Location & Metadata
 
 | Key  | Value |
 | ---- | ----- |
@@ -32,7 +32,7 @@
 
 {{s.doc}}
 
-### Location & Metadata
+##### Location & Metadata
 
 | Key | Value                       |
 | --- | --------------------------- |
