@@ -102,12 +102,6 @@
    :name (-> zloc z/down z/right z/sexpr)})
 
 (defn- -parse-defmacro
-  "
-
-  ;; WORKING NAVIGATOR for 1-ARITY TO arglists (:vector tag)
-  (-> zloc z/down (z/find-next #(= (z/tag %) :vector)) z/node)
-
-  "
   [zloc _]
   {:type :defmacro
    :name (-> zloc z/down z/right z/sexpr)
@@ -251,5 +245,6 @@
 
 (defn get-namespace-node
   "Returns namespace node for `nodes` as returned from `parse-node`."
+  {:added "0.1" :author "Chad Angelelli"}
   [nodes]
   (first (filter #(= (:type %) :ns) nodes)))

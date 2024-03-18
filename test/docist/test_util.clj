@@ -10,6 +10,8 @@
 (def kitchen-sink-ast (atom nil))
 (def kitchen-sink-errs (atom nil))
 
+(def generator-util-path "src/docist/generator/util.clj")
+
 (defn parse-parser
   [f]
   (let [{:keys [ast errs]} (d/parse [parser-path])]

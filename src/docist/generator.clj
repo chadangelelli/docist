@@ -11,9 +11,9 @@
   the vanilla Clojure `:ast` map in the return value."
   {:added "0.1" :author "Chad Angelelli"}
   (:require [clojure.java.io :as io]
+            [clojure.string :as string]
             [docist.generator.html :as html]
             [docist.generator.markdown :as markdown]
-            [docist.fmt :as fmt :refer [echo]]
             [docist.validation :as v]
             [malli.core :as m]))
 
@@ -29,6 +29,7 @@
 (defn generate-docs
   "Generates sequence of filename's and file content. Returns a sequence of
   `([FILENAME FILE-CONTENT] [FILENAME FILE-CONTENT] ..)`."
+  {:added "0.1" :author "Chad Angelelli"}
   ([ast] (generate-docs ast default-generator-options))
   ([ast {:keys [output-format] :as options}]
    (case (name output-format)
@@ -36,7 +37,8 @@
      "html" (html/generate-docs ast options))))
 
 ;;TODO: consider validating AST
-(def Valid-Geneate!-Options
+(def ^{:added "0.1" :author "Chad Angelelli"}
+  Valid-Geneate!-Options
   (m/schema
     [:map {:closed false}
      [:output-format {:optional true} [:enum :html :markdown]]
@@ -45,10 +47,17 @@
      [:template {:optional true} string?]]))
 
 (defn generate!
+  "Generates docs. Writes files to disk. Returns sequence of paths written."
+  {:added "0.1" :author "Chad Angelelli"}
   ([ast] (generate! ast default-generator-options))
   ([ast options]
    (if-let [err (v/invalidate Valid-Geneate!-Options options)]
      (throw (Exception. (str err)))
      (let [options* (merge default-generator-options options)
            docs (generate-docs ast options*)]
-       (echo :debug "docs:" (vec docs))))))
+       (doseq [{:keys [filename content]} docs
+               :let [dir (string/replace filename #"/.+\.clj[s]?$" "")]]
+         (when-not (.exists (io/file dir))
+           (io/make-parents filename))
+         (spit (io/file filename) content))
+       (map :filename docs)))))

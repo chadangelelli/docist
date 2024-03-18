@@ -4,6 +4,8 @@
   (:require [clojure.string :as string]))
 
 (defn make-filename
+  "Returns filename (string) for namespace."
+  {:added "0.1" :author "Chad Angelelli"}
   [clj-namespace {:keys [output-dir output-structure output-format]}]
   (let [nm (case (name output-structure)
              "flat" (str clj-namespace)
