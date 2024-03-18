@@ -9,14 +9,44 @@
             [selmer.parser :as template]))
 
 (def ^{:added "0.1" :author "Chad Angelelli"}
-  default-markdown-index-template
-  "Default Markdown template for `index.md`."
-  "resources/templates/markdown/index.md")
-
-(def ^{:added "0.1" :author "Chad Angelelli"}
   default-markdown-namespace-template
-  "Default Markdown template for `NAMESPACE.md`."
-  "resources/templates/markdown/namespace.md")
+"{% safe %}
+# {{ns.name}}
+
+{{ns.doc}}
+
+### Location & Metadata
+
+| Key  | Value |
+| ---- | ----- |
+| File | {{ns.file}} |
+{% if ns.meta %}
+{% for k,v in ns.meta %}
+| `{{k}}` | {{v}} |
+{% endfor %}
+{% endif %}
+
+{% for s in symbols %}
+{% if s.name %}
+## {{s.name}}
+
+{{s.doc}}
+
+### Location & Metadata
+
+| Key | Value                       |
+| --- | --------------------------- |
+| Lines | {{s.row}} - {{s.end-row}} |
+{% if s.meta %}
+{% for k,v in s.meta %}
+| `{{k}}` | {{v}} |
+{% endfor %}
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+{% endsafe%}")
 
 (defn- -cleanup-multiple-newlines
   "Replaces 3+ newline characters with 2 newline characters."
@@ -44,8 +74,7 @@
   "Main Markdown generator entry point."
   {:added "0.1" :author "Chad Angelelli"}
   [ast {:keys [template] :as options}]
-  (let [template (or template
-                     (slurp (io/file default-markdown-namespace-template)))]
+  (let [template (or template default-markdown-namespace-template)]
     (map (fn [[ns-sym nodes]]
            {:filename (gu/make-filename ns-sym options)
             :content (render-namespace-page template nodes options)})
