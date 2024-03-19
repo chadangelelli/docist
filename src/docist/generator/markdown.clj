@@ -30,6 +30,10 @@
 {% if s.name %}
 ## {{s.name}}
 
+{% if s.arglists %}
+{{s.arglists}}
+{% endif %}
+
 {{s.doc}}
 
 **Location & Metadata**
